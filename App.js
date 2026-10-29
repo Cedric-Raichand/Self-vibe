@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  FlatList,
-  Image,
-  Pressable,
-  StyleSheet,
-  Linking,
-  StatusBar,
-} from 'react-native';
+import { View, Text, ScrollView, FlatList, Image, Pressable, StyleSheet, Linking, StatusBar, } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 
 // ---------------------------------------------------------------------------
