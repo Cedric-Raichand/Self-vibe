@@ -1,5 +1,16 @@
 import React from 'react';
-import { View, Text, ScrollView, FlatList, Image, Pressable, StyleSheet, Linking, Alert, StatusBar } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Linking,
+  Alert,
+  StatusBar,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 // ---------------------------------------------------------------------------
@@ -26,6 +37,7 @@ const IMAGES = {
   venueA: require('./assets/Venue-A.png'),
   venueB: require('./assets/Venue-B.png'),
   map: require('./assets/map.png'),
+  header: require('./assets/header.png'),
 };
 
 // ---------------------------------------------------------------------------
@@ -175,28 +187,30 @@ export default function VenueScreen() {
         {/* Hero */}
         <View style={styles.hero}>
           <Photo source={IMAGES.hero} style={StyleSheet.absoluteFill} />
-          <CircleButton icon="arrow-back" style={styles.heroBack} onPress={() => {}} />
-          <View style={styles.heroActions}>
-            <CircleButton icon="share-social-outline" onPress={() => {}} />
-            <CircleButton icon="heart-outline" onPress={() => {}} />
-          </View>
-          <Pressable style={styles.claimPill}>
-            <Text style={styles.claimText}>Claim business</Text>
-          </Pressable>
         </View>
 
         <View style={styles.body}>
           {/* Header + notice + actions */}
           <View>
-            <Text style={styles.title}>{VENUE.name}</Text>
-            <Text style={styles.category}>{VENUE.category}</Text>
+            {IMAGES.header ? (
+              <Image
+                source={IMAGES.header}
+                style={styles.headerImage}
+                resizeMode="contain"
+              />
+            ) : (
+              <>
+                <Text style={styles.title}>{VENUE.name}</Text>
+                <Text style={styles.category}>{VENUE.category}</Text>
 
-            <View style={styles.locationPill}>
-              <Ionicons name="location-sharp" size={12} color={theme.text} />
-              <Text style={styles.locationText}>
-                {VENUE.distance} · {VENUE.area}
-              </Text>
-            </View>
+                <View style={styles.locationPill}>
+                  <Ionicons name="location-sharp" size={12} color={theme.text} />
+                  <Text style={styles.locationText}>
+                    {VENUE.distance} · {VENUE.area}
+                  </Text>
+                </View>
+              </>
+            )}
 
             <Text style={styles.notice}>{VENUE.notice}</Text>
 
@@ -280,6 +294,7 @@ const styles = StyleSheet.create({
 
   body: { paddingHorizontal: 20, paddingTop: 20 },
 
+  headerImage: { width: '100%', aspectRatio: 353 / 128 },
   title: { fontSize: 22, fontWeight: '700', color: theme.text },
   category: { fontSize: 13, color: theme.muted, marginTop: 4 },
   locationPill: {
