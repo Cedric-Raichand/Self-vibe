@@ -226,8 +226,7 @@ export default function VenueScreen() {
 // (content is 353), hero 303 tall, 42px between sections.
 // ---------------------------------------------------------------------------
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: theme.white },
-
+ screen: { flex: 1, backgroundColor: theme.white, width: '100%', maxWidth: 480, alignSelf: 'center' },
   hero: { width: '100%', height: 303, backgroundColor: theme.placeholder },
 
   body: { paddingHorizontal: 20, paddingTop: 20 },
