@@ -38,6 +38,8 @@ const IMAGES = {
   venueB: require('./assets/Venue-B.png'),
   map: require('./assets/map.png'),
   header: require('./assets/header.png'),
+  buttons: require('./assets/buttons.png'),
+
 };
 
 // ---------------------------------------------------------------------------
@@ -214,12 +216,29 @@ export default function VenueScreen() {
 
             <Text style={styles.notice}>{VENUE.notice}</Text>
 
-            <Pressable style={styles.primaryBtn} onPress={callVenue}>
-              <Text style={styles.primaryBtnText}>Call venue</Text>
-            </Pressable>
-            <Pressable style={styles.secondaryBtn} onPress={emailMe}>
-              <Text style={styles.secondaryBtnText}>Email me when available</Text>
-            </Pressable>
+            {IMAGES.buttons ? (
+              <View style={styles.buttonsImage}>
+                <Image
+                  source={IMAGES.buttons}
+                  style={StyleSheet.absoluteFill}
+                  resizeMode="contain"
+                />
+                {/* Invisible tap areas on top of the image: top half = Call, bottom half = Email */}
+                <View style={StyleSheet.absoluteFill}>
+                  <Pressable style={{ flex: 1 }} onPress={callVenue} />
+                  <Pressable style={{ flex: 1 }} onPress={emailMe} />
+                </View>
+              </View>
+            ) : (
+              <>
+                <Pressable style={styles.primaryBtn} onPress={callVenue}>
+                  <Text style={styles.primaryBtnText}>Call venue</Text>
+                </Pressable>
+                <Pressable style={styles.secondaryBtn} onPress={emailMe}>
+                  <Text style={styles.secondaryBtnText}>Email me when available</Text>
+                </Pressable>
+              </>
+            )}
           </View>
 
           {/* Similar venues */}
@@ -295,6 +314,7 @@ const styles = StyleSheet.create({
   body: { paddingHorizontal: 20, paddingTop: 20 },
 
   headerImage: { width: '100%', aspectRatio: 353 / 128 },
+  buttonsImage: { width: '100%', aspectRatio: 353 / 112, marginTop: 20 },
   title: { fontSize: 22, fontWeight: '700', color: theme.text },
   category: { fontSize: 13, color: theme.muted, marginTop: 4 },
   locationPill: {
