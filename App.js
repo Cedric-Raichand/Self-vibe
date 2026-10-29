@@ -157,66 +157,66 @@ export default function VenueScreen() {
     );
 
   return (
-    <View style={styles.screen}>
-      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+    <View style={styles.outer}>
+      <View style={styles.screen}>
+        <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 40 }}
-      >
-        {/* Hero (image only) */}
-        <View style={styles.hero}>
-          <Photo source={IMAGES.hero} style={StyleSheet.absoluteFill} />
-        </View>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 40 }}
+        >
+          {/* Hero (image only) */}
+          <Image source={IMAGES.hero} style={styles.hero} resizeMode="cover" />
 
-        <View style={styles.body}>
-          {/* Header image + notice + buttons image (all display only) */}
-          <View>
-            <Image
-              source={IMAGES.header}
-              style={styles.headerImage}
-              resizeMode="contain"
-            />
+          <View style={styles.body}>
+            {/* Header image + notice + buttons image (all display only) */}
+            <View>
+              <Image
+                source={IMAGES.header}
+                style={styles.headerImage}
+                resizeMode="contain"
+              />
 
-            <Text style={styles.notice}>{VENUE.notice}</Text>
+              <Text style={styles.notice}>{VENUE.notice}</Text>
 
-            <Image
-              source={IMAGES.buttons}
-              style={styles.buttonsImage}
-              resizeMode="contain"
-            />
+              <Image
+                source={IMAGES.buttons}
+                style={styles.buttonsImage}
+                resizeMode="contain"
+              />
+            </View>
+
+            {/* Similar venues */}
+            <View style={styles.section}>
+              <SectionTitle>Similar venues you may like</SectionTitle>
+              <VenueList data={SIMILAR} />
+            </View>
+
+            {/* Services */}
+            <View style={styles.section}>
+              <SectionTitle>Services</SectionTitle>
+              <Text style={styles.bodyText}>{VENUE.services}</Text>
+            </View>
+
+            {/* Map */}
+            <View style={styles.section}>
+              <Photo source={IMAGES.map} style={styles.map} />
+              <Text style={styles.address}>{VENUE.address}</Text>
+              <Pressable onPress={getDirections}>
+                <Text style={styles.link}>Get direction</Text>
+              </Pressable>
+            </View>
+
+            <View style={styles.divider} />
+
+            {/* Venues nearby */}
+            <View style={{ marginTop: 24 }}>
+              <SectionTitle>Venues nearby</SectionTitle>
+              <VenueList data={NEARBY} />
+            </View>
           </View>
-
-          {/* Similar venues */}
-          <View style={styles.section}>
-            <SectionTitle>Similar venues you may like</SectionTitle>
-            <VenueList data={SIMILAR} />
-          </View>
-
-          {/* Services */}
-          <View style={styles.section}>
-            <SectionTitle>Services</SectionTitle>
-            <Text style={styles.bodyText}>{VENUE.services}</Text>
-          </View>
-
-          {/* Map */}
-          <View style={styles.section}>
-            <Photo source={IMAGES.map} style={styles.map} />
-            <Text style={styles.address}>{VENUE.address}</Text>
-            <Pressable onPress={getDirections}>
-              <Text style={styles.link}>Get direction</Text>
-            </Pressable>
-          </View>
-
-          <View style={styles.divider} />
-
-          {/* Venues nearby */}
-          <View style={{ marginTop: 24 }}>
-            <SectionTitle>Venues nearby</SectionTitle>
-            <VenueList data={NEARBY} />
-          </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </View>
   );
 }
@@ -226,8 +226,12 @@ export default function VenueScreen() {
 // (content is 353), hero 303 tall, 42px between sections.
 // ---------------------------------------------------------------------------
 const styles = StyleSheet.create({
- screen: { flex: 1, backgroundColor: theme.white, width: '100%', maxWidth: 480, alignSelf: 'center' },
-  hero: { width: '100%', height: 303, backgroundColor: theme.placeholder },
+  // On a phone this fills the screen. On a laptop (web) it becomes a centered
+  // phone-sized column with a light grey background around it.
+  outer: { flex: 1, alignItems: 'center', backgroundColor: '#F2F2F2' },
+  screen: { flex: 1, width: '100%', maxWidth: 480, backgroundColor: theme.white },
+
+  hero: { width: '100%', height: 303 },
 
   body: { paddingHorizontal: 20, paddingTop: 20 },
 
