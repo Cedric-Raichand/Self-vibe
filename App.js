@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -47,6 +47,7 @@ const VENUE = {
   distance: '>30 km',
   area: 'East Legon, Accra',
   address: 'East Legon, Accra, Ghana',
+  phone: '+233550371895', // read from tiny text in Figma, so double-check it
   notice:
     'Unfortunately, this venue is not on the Self Vibe partner network. You can give them a call to make a booking. If you like, we will notify you by email if this venue joins.',
   services:
@@ -153,6 +154,11 @@ function VenueList({ data }) {
 // Screen
 // ---------------------------------------------------------------------------
 export default function VenueScreen() {
+  // true once the user taps "Email me when available"
+  const [notify, setNotify] = useState(false);
+
+  const callVenue = () => Linking.openURL(`tel:${VENUE.phone}`);
+
   const getDirections = () =>
     Linking.openURL(
       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -173,7 +179,7 @@ export default function VenueScreen() {
           <Image source={IMAGES.hero} style={styles.hero} resizeMode="cover" />
 
           <View style={styles.body}>
-            {/* Title, location pill, notice, buttons (display only) */}
+            {/* Title, location pill, notice, buttons */}
             <View>
               <Text style={styles.title}>{VENUE.name}</Text>
               <Text style={styles.category}>{VENUE.category}</Text>
@@ -187,12 +193,23 @@ export default function VenueScreen() {
 
               <Text style={styles.notice}>{VENUE.notice}</Text>
 
-              <View style={styles.primaryBtn}>
+              <Pressable
+                style={({ pressed }) => [styles.primaryBtn, pressed && styles.pressed]}
+                onPress={callVenue}
+              >
                 <Text style={styles.primaryBtnText}>Call venue</Text>
-              </View>
-              <View style={styles.secondaryBtn}>
-                <Text style={styles.secondaryBtnText}>Email me when available</Text>
-              </View>
+              </Pressable>
+
+              <Pressable
+                style={({ pressed }) => [styles.secondaryBtn, pressed && styles.pressed]}
+                onPress={() => setNotify(true)}
+              >
+                <Text style={styles.secondaryBtnText}>
+                  {notify
+                    ? "We'll email you when it's available"
+                    : 'Email me when available'}
+                </Text>
+              </Pressable>
             </View>
 
             {/* Similar venues */}
@@ -280,6 +297,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   secondaryBtnText: { color: theme.text, fontSize: 14, fontWeight: '500' },
+  pressed: { opacity: 0.7 },
 
   section: { marginTop: 42 },
   sectionTitle: {
