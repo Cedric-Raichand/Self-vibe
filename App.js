@@ -226,7 +226,15 @@ export default function VenueScreen() {
 
             {/* Map */}
             <View style={styles.section}>
-              <Photo source={IMAGES.map} style={styles.map} />
+              {/* The exported map image also has the address text baked in at the
+                  bottom, so we crop to just the map part (top 197px). */}
+              <View style={styles.mapWrap}>
+                <Image
+                  source={IMAGES.map}
+                  style={styles.mapImage}
+                  resizeMode="cover"
+                />
+              </View>
               <Text style={styles.address}>{VENUE.address}</Text>
               <Pressable onPress={getDirections}>
                 <Text style={styles.link}>Get direction</Text>
@@ -274,8 +282,14 @@ const styles = StyleSheet.create({
     marginTop: 14,
     gap: 6,
   },
-  locationText: { fontSize: 12, color: theme.text },
-  notice: { fontSize: 13, lineHeight: 19, color: theme.text, marginTop: 20 },
+  locationText: { fontSize: 13, fontWeight: '500', color: theme.black },
+  notice: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: '500',
+    color: theme.black,
+    marginTop: 20,
+  },
 
   primaryBtn: {
     height: 48,
@@ -336,7 +350,8 @@ const styles = StyleSheet.create({
   ratingRow: { flexDirection: 'row', alignItems: 'center' },
   cardMeta: { fontSize: 12, color: theme.muted, marginTop: 3 },
 
-  map: { width: '100%', height: 197, borderRadius: 12 },
+  mapWrap: { width: '100%', height: 197, borderRadius: 12, overflow: 'hidden' },
+  mapImage: { width: '100%', aspectRatio: 353 / 260 },
   address: { fontSize: 13, color: theme.text, marginTop: 10 },
   link: { fontSize: 13, color: theme.purple, marginTop: 4 },
 
