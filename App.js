@@ -41,6 +41,21 @@ const IMAGES = {
   map: require('./assets/map.png'),
 };
 
+// If your Background.png already has the back/share/heart icons and the
+// "Claim business" pill baked into it, keep this true: the code then puts
+// invisible tap areas on top of them instead of drawing a second set.
+// Set it to false if you ever export the hero without those icons.
+const HERO_HAS_ICONS_BAKED = true;
+
+// Show the hero at the picture's own shape so nothing gets cropped.
+const heroSrc = Image.resolveAssetSource
+  ? Image.resolveAssetSource(IMAGES.hero)
+  : null;
+const HERO_ASPECT =
+  heroSrc && heroSrc.width && heroSrc.height
+    ? heroSrc.width / heroSrc.height
+    : 393 / 303;
+
 // ---------------------------------------------------------------------------
 // Static data (hardcoded for now; replace with an API later).
 // ---------------------------------------------------------------------------
@@ -95,14 +110,19 @@ function Photo({ source, style }) {
 }
 
 // White round icon button (used on the hero)
-function RoundButton({ icon, onPress, color = theme.black }) {
+// `ghost` = invisible tap area (used when the icon is already in the picture)
+function RoundButton({ icon, onPress, color = theme.black, ghost = false }) {
   return (
     <Pressable
       onPress={onPress}
       hitSlop={8}
-      style={({ pressed }) => [styles.roundBtn, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.roundBtn,
+        ghost && styles.ghost,
+        !ghost && pressed && styles.pressed,
+      ]}
     >
-      <Ionicons name={icon} size={18} color={color} />
+      {!ghost && <Ionicons name={icon} size={18} color={color} />}
     </Pressable>
   );
 }
@@ -209,23 +229,40 @@ export default function VenueScreen() {
 
             <View style={styles.heroBack}>
               {/* Single screen, so nothing to go back to yet */}
-              <RoundButton icon="arrow-back" onPress={() => {}} />
+              <RoundButton
+                icon="arrow-back"
+                onPress={() => {}}
+                ghost={HERO_HAS_ICONS_BAKED}
+              />
             </View>
 
             <View style={styles.heroActions}>
-              <RoundButton icon="share-social-outline" onPress={shareVenue} />
+              <RoundButton
+                icon="share-social-outline"
+                onPress={shareVenue}
+                ghost={HERO_HAS_ICONS_BAKED}
+              />
               <RoundButton
                 icon={saved ? 'heart' : 'heart-outline'}
                 color={saved ? '#E11D48' : theme.black}
                 onPress={() => setSaved((s) => !s)}
+                ghost={HERO_HAS_ICONS_BAKED}
               />
             </View>
 
             <Pressable
-              style={({ pressed }) => [styles.claimPill, pressed && styles.pressed]}
+              style={({ pressed }) => [
+                styles.claimPill,
+                HERO_HAS_ICONS_BAKED && styles.ghost,
+                !HERO_HAS_ICONS_BAKED && pressed && styles.pressed,
+              ]}
               onPress={() => {}}
             >
-              <Text style={styles.claimText}>Claim business</Text>
+              <Text
+                style={[styles.claimText, HERO_HAS_ICONS_BAKED && { opacity: 0 }]}
+              >
+                Claim business
+              </Text>
             </Pressable>
           </View>
 
@@ -318,9 +355,10 @@ const styles = StyleSheet.create({
   // Hero
   hero: {
     width: '100%',
-    aspectRatio: 393 / 303,
+    aspectRatio: HERO_ASPECT,
     backgroundColor: theme.placeholder,
   },
+  ghost: { backgroundColor: 'transparent' },
   heroBack: { position: 'absolute', top: 44, left: 20 },
   heroActions: {
     position: 'absolute',
@@ -403,7 +441,12 @@ const styles = StyleSheet.create({
     color: theme.black,
     marginBottom: 14,
   },
-  bodyText: { fontSize: 14, lineHeight: 22, color: theme.text },
+  bodyText: {
+    fontSize: 14,
+    lineHeight: 22,
+    fontWeight: '500',
+    color: theme.black,
+  },
 
   // Horizontal lists bleed to the screen edges but start aligned with content.
   listBleed: { marginHorizontal: -20 },
