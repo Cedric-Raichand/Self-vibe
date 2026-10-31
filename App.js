@@ -194,7 +194,7 @@ export default function VenueScreen() {
           <View style={styles.hero}>
             <Image
               source={IMAGES.hero}
-              style={StyleSheet.absoluteFill}
+              style={styles.heroImage}
               resizeMode="cover"
             />
 
@@ -307,11 +307,9 @@ const styles = StyleSheet.create({
   screen: { flex: 1, width: '100%', maxWidth: 480, backgroundColor: theme.white },
 
   // Hero: same shape as the exported picture (786x606 = 393x303 at 2x)
-  hero: {
-    width: '100%',
-    aspectRatio: 393 / 303,
-    backgroundColor: theme.placeholder,
-  },
+  // The hero's height comes from the picture itself: full width, 393:303 shape.
+  hero: { width: '100%', overflow: 'hidden', backgroundColor: theme.placeholder },
+  heroImage: { width: '100%', aspectRatio: 393 / 303 },
 
   // Invisible tap areas. Sizes/positions are fractions of the hero, measured
   // from the exported picture, so they stay on top of the icons at any width.
