@@ -10,6 +10,7 @@ import {
   Linking,
   Share,
   StatusBar,
+  useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -162,6 +163,14 @@ export default function VenueScreen() {
   const [notify, setNotify] = useState(false); // "Email me when available" tapped
   const [saved, setSaved] = useState(false); // hero heart
 
+  // Image sizes are worked out in numbers (instead of aspectRatio) because the
+  // browser otherwise keeps each picture's own pixel height and stretches it.
+  const { width: winWidth } = useWindowDimensions();
+  const screenW = Math.min(winWidth, 480); // same max width as the screen below
+  const heroH = (screenW * 303) / 393; // hero is 393 x 303 in Figma
+  const mapW = screenW - 40; // 20px padding on each side
+  const mapH = (mapW * 260) / 353; // map picture is 353 x 260 in Figma
+
   const callVenue = () => Linking.openURL(`tel:${VENUE.phone}`);
 
   const shareVenue = async () => {
@@ -191,10 +200,10 @@ export default function VenueScreen() {
           contentContainerStyle={{ paddingBottom: 40 }}
         >
           {/* Hero: the exported picture + invisible tap areas over its icons */}
-          <View style={styles.hero}>
+          <View style={[styles.hero, { height: heroH }]}>
             <Image
               source={IMAGES.hero}
-              style={styles.heroImage}
+              style={{ width: screenW, height: heroH }}
               resizeMode="cover"
             />
 
@@ -272,7 +281,7 @@ export default function VenueScreen() {
               <View style={styles.mapWrap}>
                 <Image
                   source={IMAGES.map}
-                  style={styles.mapImage}
+                  style={{ width: mapW, height: mapH }}
                   resizeMode="cover"
                 />
               </View>
@@ -307,9 +316,8 @@ const styles = StyleSheet.create({
   screen: { flex: 1, width: '100%', maxWidth: 480, backgroundColor: theme.white },
 
   // Hero: same shape as the exported picture (786x606 = 393x303 at 2x)
-  // The hero's height comes from the picture itself: full width, 393:303 shape.
+  // Height is set in the component (from the screen width, 393:303 shape).
   hero: { width: '100%', overflow: 'hidden', backgroundColor: theme.placeholder },
-  heroImage: { width: '100%', aspectRatio: 393 / 303 },
 
   // Invisible tap areas. Sizes/positions are fractions of the hero, measured
   // from the exported picture, so they stay on top of the icons at any width.
@@ -407,15 +415,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 10,
+    marginTop: 12,
   },
   cardNameLeft: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
   cardName: { fontSize: 13, fontWeight: '600', color: theme.black },
   ratingRow: { flexDirection: 'row', alignItems: 'center' },
-  cardMeta: { fontSize: 12, color: theme.muted, marginTop: 3 },
+  cardMeta: { fontSize: 12, lineHeight: 17, color: theme.muted, marginTop: 4 },
 
   mapWrap: { width: '100%', height: 197, borderRadius: 12, overflow: 'hidden' },
-  mapImage: { width: '100%', aspectRatio: 353 / 260 },
   address: { fontSize: 14, fontWeight: '500', color: theme.black, marginTop: 12 },
   link: { fontSize: 14, color: theme.purple, marginTop: 4 },
 
