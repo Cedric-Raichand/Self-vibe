@@ -30,9 +30,11 @@ const theme = {
 
 // ---------------------------------------------------------------------------
 // Only 4 images come from Figma (all inside ./assets). Everything else on the
-// screen (hero buttons, title, notice, buttons, card text) is coded below.
-// For the hero, export the 393x303 hero frame with the back/share/heart icons,
-// the "Claim business" pill and the 9:41 status bar HIDDEN.
+// screen (title, notice, buttons, card text) is coded below.
+//
+// Background.png is the full 393x303 hero frame exported at 2x (786x606). It
+// already has the status bar, back/share/heart icons and the "Claim business"
+// pill in the picture, so the hero below only adds invisible tap areas on top.
 // ---------------------------------------------------------------------------
 const IMAGES = {
   hero: require('./assets/Background.png'),
@@ -40,21 +42,6 @@ const IMAGES = {
   venueB: require('./assets/Venue-B.png'),
   map: require('./assets/map.png'),
 };
-
-// If your Background.png already has the back/share/heart icons and the
-// "Claim business" pill baked into it, keep this true: the code then puts
-// invisible tap areas on top of them instead of drawing a second set.
-// Set it to false if you ever export the hero without those icons.
-const HERO_HAS_ICONS_BAKED = true;
-
-// Show the hero at the picture's own shape so nothing gets cropped.
-const heroSrc = Image.resolveAssetSource
-  ? Image.resolveAssetSource(IMAGES.hero)
-  : null;
-const HERO_ASPECT =
-  heroSrc && heroSrc.width && heroSrc.height
-    ? heroSrc.width / heroSrc.height
-    : 393 / 303;
 
 // ---------------------------------------------------------------------------
 // Static data (hardcoded for now; replace with an API later).
@@ -107,24 +94,6 @@ function Photo({ source, style }) {
     return <Image source={source} style={style} resizeMode="cover" />;
   }
   return <View style={[style, { backgroundColor: theme.placeholder }]} />;
-}
-
-// White round icon button (used on the hero)
-// `ghost` = invisible tap area (used when the icon is already in the picture)
-function RoundButton({ icon, onPress, color = theme.black, ghost = false }) {
-  return (
-    <Pressable
-      onPress={onPress}
-      hitSlop={8}
-      style={({ pressed }) => [
-        styles.roundBtn,
-        ghost && styles.ghost,
-        !ghost && pressed && styles.pressed,
-      ]}
-    >
-      {!ghost && <Ionicons name={icon} size={18} color={color} />}
-    </Pressable>
-  );
 }
 
 function SectionTitle({ children }) {
@@ -213,13 +182,15 @@ export default function VenueScreen() {
   return (
     <View style={styles.outer}>
       <View style={styles.screen}>
-        <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+        {/* The picture already shows a status bar (9:41, signal, battery), so
+            hide the phone's own one to avoid showing two. */}
+        <StatusBar hidden />
 
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 40 }}
         >
-          {/* Hero: photo + coded back / share / heart + Claim business */}
+          {/* Hero: the exported picture + invisible tap areas over its icons */}
           <View style={styles.hero}>
             <Image
               source={IMAGES.hero}
@@ -227,43 +198,26 @@ export default function VenueScreen() {
               resizeMode="cover"
             />
 
-            <View style={styles.heroBack}>
-              {/* Single screen, so nothing to go back to yet */}
-              <RoundButton
-                icon="arrow-back"
-                onPress={() => {}}
-                ghost={HERO_HAS_ICONS_BAKED}
-              />
-            </View>
+            {/* back arrow (single screen, so nothing to go back to yet) */}
+            <Pressable style={[styles.tap, styles.tapBack]} onPress={() => {}} />
 
-            <View style={styles.heroActions}>
-              <RoundButton
-                icon="share-social-outline"
-                onPress={shareVenue}
-                ghost={HERO_HAS_ICONS_BAKED}
-              />
-              <RoundButton
-                icon={saved ? 'heart' : 'heart-outline'}
-                color={saved ? '#E11D48' : theme.black}
-                onPress={() => setSaved((s) => !s)}
-                ghost={HERO_HAS_ICONS_BAKED}
-              />
-            </View>
+            {/* share */}
+            <Pressable style={[styles.tap, styles.tapShare]} onPress={shareVenue} />
 
+            {/* heart: shows a red heart on top of the picture when saved */}
             <Pressable
-              style={({ pressed }) => [
-                styles.claimPill,
-                HERO_HAS_ICONS_BAKED && styles.ghost,
-                !HERO_HAS_ICONS_BAKED && pressed && styles.pressed,
-              ]}
-              onPress={() => {}}
+              style={[styles.tap, styles.tapHeart]}
+              onPress={() => setSaved((s) => !s)}
             >
-              <Text
-                style={[styles.claimText, HERO_HAS_ICONS_BAKED && { opacity: 0 }]}
-              >
-                Claim business
-              </Text>
+              {saved && (
+                <View style={styles.heartOn}>
+                  <Ionicons name="heart" size={22} color="#E11D48" />
+                </View>
+              )}
             </Pressable>
+
+            {/* Claim business */}
+            <Pressable style={[styles.tap, styles.tapClaim]} onPress={() => {}} />
           </View>
 
           <View style={styles.body}>
@@ -352,41 +306,27 @@ const styles = StyleSheet.create({
   outer: { flex: 1, alignItems: 'center', backgroundColor: '#F2F2F2' },
   screen: { flex: 1, width: '100%', maxWidth: 480, backgroundColor: theme.white },
 
-  // Hero
+  // Hero: same shape as the exported picture (786x606 = 393x303 at 2x)
   hero: {
     width: '100%',
-    aspectRatio: HERO_ASPECT,
+    aspectRatio: 393 / 303,
     backgroundColor: theme.placeholder,
   },
-  ghost: { backgroundColor: 'transparent' },
-  heroBack: { position: 'absolute', top: 44, left: 20 },
-  heroActions: {
-    position: 'absolute',
-    top: 44,
-    right: 20,
-    flexDirection: 'row',
-    gap: 12,
-  },
-  roundBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: theme.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  claimPill: {
-    position: 'absolute',
-    right: 20,
-    bottom: 19,
-    height: 34,
-    paddingHorizontal: 16,
+
+  // Invisible tap areas. Sizes/positions are fractions of the hero, measured
+  // from the exported picture, so they stay on top of the icons at any width.
+  tap: { position: 'absolute' },
+  tapBack: { left: '4.8%', top: '13.7%', width: '9.7%', aspectRatio: 1 },
+  tapShare: { left: '73.3%', top: '13.7%', width: '9.7%', aspectRatio: 1 },
+  tapHeart: { left: '85.5%', top: '13.7%', width: '9.7%', aspectRatio: 1 },
+  tapClaim: { left: '64.6%', top: '82.5%', width: '30.3%', aspectRatio: 119 / 35.5 },
+  heartOn: {
+    ...StyleSheet.absoluteFillObject,
     borderRadius: 999,
-    backgroundColor: theme.purple,
+    backgroundColor: '#EFE9DF',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  claimText: { color: theme.white, fontSize: 12, fontWeight: '600' },
 
   body: { paddingHorizontal: 20, paddingTop: 28 },
 
