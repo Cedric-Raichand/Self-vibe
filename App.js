@@ -236,10 +236,10 @@ export default function VenueScreen() {
               <Text style={styles.category}>{VENUE.category}</Text>
 
               <View style={styles.locationPill}>
-                <Ionicons name="location-sharp" size={14} color={theme.black} />
-                <Text style={styles.locationText}>
-                  {VENUE.distance} · {VENUE.area}
-                </Text>
+                <Ionicons name="location-sharp" size={18} color={theme.black} />
+                <Text style={styles.locationText}>{VENUE.distance}</Text>
+                <View style={styles.locationDot} />
+                <Text style={styles.locationText}>{VENUE.area}</Text>
               </View>
 
               <Text style={styles.notice}>{VENUE.notice}</Text>
@@ -342,14 +342,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'stretch',
+    // From the Figma panel: fill #F9F9F9, 12 radius, 1px border (black at 2%),
+    // 10 padding, 8 gap, 45 tall.
     backgroundColor: theme.surface,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.02)',
+    padding: 10,
+    minHeight: 45,
     marginTop: 18,
     gap: 8,
   },
   locationText: { fontSize: 14, fontWeight: '500', color: theme.black },
+  locationDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: theme.black },
   notice: {
     fontSize: 15,
     lineHeight: 22,
