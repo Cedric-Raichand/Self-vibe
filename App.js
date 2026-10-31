@@ -167,7 +167,18 @@ export default function VenueScreen() {
   // browser otherwise keeps each picture's own pixel height and stretches it.
   const { width: winWidth } = useWindowDimensions();
   const screenW = Math.min(winWidth, 480); // same max width as the screen below
-  const heroH = (screenW * 303) / 393; // hero is 393 x 303 in Figma
+  const scale = screenW / 393; // everything in Figma is drawn 393 wide
+  const HERO_CROP = 38; // Figma px cut off the top to hide the picture's own 9:41 status bar
+  const heroFullH = 303 * scale; // the whole picture (393 x 303 in Figma)
+  const heroH = heroFullH - HERO_CROP * scale; // what we actually show
+  // Invisible tap area placed over an icon, using Figma coordinates
+  const tapArea = (x, y, w, h) => ({
+    position: 'absolute',
+    left: x * scale,
+    top: (y - HERO_CROP) * scale,
+    width: w * scale,
+    height: h * scale,
+  });
   const mapW = screenW - 40; // 20px padding on each side
   const mapH = (mapW * 260) / 353; // map picture is 353 x 260 in Figma
 
@@ -203,19 +214,23 @@ export default function VenueScreen() {
           <View style={[styles.hero, { height: heroH }]}>
             <Image
               source={IMAGES.hero}
-              style={{ width: screenW, height: heroH }}
+              style={{
+                width: screenW,
+                height: heroFullH,
+                marginTop: -HERO_CROP * scale,
+              }}
               resizeMode="cover"
             />
 
             {/* back arrow (single screen, so nothing to go back to yet) */}
-            <Pressable style={[styles.tap, styles.tapBack]} onPress={() => {}} />
+            <Pressable style={tapArea(19, 41.5, 38, 38)} onPress={() => {}} />
 
             {/* share */}
-            <Pressable style={[styles.tap, styles.tapShare]} onPress={shareVenue} />
+            <Pressable style={tapArea(288, 41.5, 38, 38)} onPress={shareVenue} />
 
             {/* heart: shows a red heart on top of the picture when saved */}
             <Pressable
-              style={[styles.tap, styles.tapHeart]}
+              style={tapArea(336, 41.5, 38, 38)}
               onPress={() => setSaved((s) => !s)}
             >
               {saved && (
@@ -226,7 +241,7 @@ export default function VenueScreen() {
             </Pressable>
 
             {/* Claim business */}
-            <Pressable style={[styles.tap, styles.tapClaim]} onPress={() => {}} />
+            <Pressable style={tapArea(254, 250, 119, 35.5)} onPress={() => {}} />
           </View>
 
           <View style={styles.body}>
