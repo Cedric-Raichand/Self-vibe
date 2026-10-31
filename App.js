@@ -1,5 +1,15 @@
 import React from 'react';
-import { View, Text, ScrollView, FlatList, Image, Pressable, StyleSheet, Linking, StatusBar, } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Linking,
+  StatusBar,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 // ---------------------------------------------------------------------------
@@ -13,16 +23,16 @@ const theme = {
   text: '#111111',
   muted: '#6B6B6B',
   border: '#E6E6E6',
+  surface: '#F9F9F9',
   placeholder: '#E3E3E3',
 };
 
 // ---------------------------------------------------------------------------
-// Images exported from Figma (all inside ./assets).
+// Only 4 images come from Figma (all inside ./assets). Everything else on the
+// screen (title, location pill, notice, buttons, cards text) is coded below.
 // ---------------------------------------------------------------------------
 const IMAGES = {
   hero: require('./assets/Background.png'),
-  header: require('./assets/header.png'),
-  buttons: require('./assets/buttons.png'),
   venueA: require('./assets/Venue-A.png'),
   venueB: require('./assets/Venue-B.png'),
   map: require('./assets/map.png'),
@@ -32,6 +42,10 @@ const IMAGES = {
 // Static data (hardcoded for now; replace with an API later).
 // ---------------------------------------------------------------------------
 const VENUE = {
+  name: 'Nails Geek',
+  category: 'Beauty salon',
+  distance: '>30 km',
+  area: 'East Legon, Accra',
   address: 'East Legon, Accra, Ghana',
   notice:
     'Unfortunately, this venue is not on the Self Vibe partner network. You can give them a call to make a booking. If you like, we will notify you by email if this venue joins.',
@@ -159,21 +173,26 @@ export default function VenueScreen() {
           <Image source={IMAGES.hero} style={styles.hero} resizeMode="cover" />
 
           <View style={styles.body}>
-            {/* Header image + notice + buttons image (all display only) */}
+            {/* Title, location pill, notice, buttons (display only) */}
             <View>
-              <Image
-                source={IMAGES.header}
-                style={styles.headerImage}
-                resizeMode="contain"
-              />
+              <Text style={styles.title}>{VENUE.name}</Text>
+              <Text style={styles.category}>{VENUE.category}</Text>
+
+              <View style={styles.locationPill}>
+                <Ionicons name="location-sharp" size={12} color={theme.text} />
+                <Text style={styles.locationText}>
+                  {VENUE.distance} · {VENUE.area}
+                </Text>
+              </View>
 
               <Text style={styles.notice}>{VENUE.notice}</Text>
 
-              <Image
-                source={IMAGES.buttons}
-                style={styles.buttonsImage}
-                resizeMode="contain"
-              />
+              <View style={styles.primaryBtn}>
+                <Text style={styles.primaryBtnText}>Call venue</Text>
+              </View>
+              <View style={styles.secondaryBtn}>
+                <Text style={styles.secondaryBtnText}>Email me when available</Text>
+              </View>
             </View>
 
             {/* Similar venues */}
@@ -225,9 +244,42 @@ const styles = StyleSheet.create({
 
   body: { paddingHorizontal: 20, paddingTop: 20 },
 
-  headerImage: { width: '100%', aspectRatio: 353 / 128 },
-  buttonsImage: { width: '100%', aspectRatio: 353 / 112, marginTop: 20 },
+  title: { fontSize: 22, fontWeight: '700', color: theme.text },
+  category: { fontSize: 13, color: theme.muted, marginTop: 4 },
+  locationPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    backgroundColor: theme.surface,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginTop: 14,
+    gap: 6,
+  },
+  locationText: { fontSize: 12, color: theme.text },
   notice: { fontSize: 13, lineHeight: 19, color: theme.text, marginTop: 20 },
+
+  primaryBtn: {
+    height: 48,
+    borderRadius: 999,
+    backgroundColor: theme.black,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  primaryBtnText: { color: theme.white, fontSize: 14, fontWeight: '600' },
+  secondaryBtn: {
+    height: 48,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: theme.border,
+    backgroundColor: theme.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  secondaryBtnText: { color: theme.text, fontSize: 14, fontWeight: '500' },
 
   section: { marginTop: 42 },
   sectionTitle: {
