@@ -168,7 +168,9 @@ export default function VenueScreen() {
   const { width: winWidth } = useWindowDimensions();
   const screenW = Math.min(winWidth, 480); // same max width as the screen below
   const scale = screenW / 393; // everything in Figma is drawn 393 wide
-  const HERO_CROP = 38; // Figma px cut off the top to hide the picture's own 9:41 status bar
+  // The status bar (9:41 etc.) is now painted out of Background.png itself, so
+  // nothing needs cropping. Raise this only if you ever want to trim the top.
+  const HERO_CROP = 0;
   const heroFullH = 303 * scale; // the whole picture (393 x 303 in Figma)
   const heroH = heroFullH - HERO_CROP * scale; // what we actually show
   // Invisible tap area placed over an icon, using Figma coordinates
