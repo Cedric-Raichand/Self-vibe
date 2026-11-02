@@ -73,7 +73,7 @@ const VENUE = {
   notice:
     'Unfortunately, this venue is not on the Self Vibe partner network. You can give them a call to make a booking. If you like, we will notify you by email if this venue joins.',
   services:
-    'Acne treatments, Acrylic nails, Body waxing, Brazilian waxing, Manicure, Massage, Microblading, Pedicure, Permanent makeup',
+    'At present, we do not have service information for this venue. Please see their website or wait to visit the venue to learn more.',
 };
 
 const SIMILAR = [
