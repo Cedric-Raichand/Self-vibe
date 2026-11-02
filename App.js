@@ -92,8 +92,11 @@ const VENUE = {
   phoneLabel: '+233 55 037 1895',
   notice:
     'Unfortunately, this venue is not on the Self Vibe partner network. You can give them a call to make a booking. If you like, we will notify you by email if this venue joins.',
-  services:
+  // Mobile Figma shows the list of services; the desktop Figma shows this message.
+  servicesMobile:
     'Acne treatments, Acrylic nails, Body waxing, Brazilian waxing, Manicure, Massage, Microblading, Pedicure, Permanent makeup',
+  services:
+    'At present, we do not have service information for this venue. Please see their website or wait to visit the venue to learn more.',
 };
 
 const SIMILAR = [
@@ -529,7 +532,7 @@ function MobileLayout({
         {/* Services */}
         <View style={styles.section}>
           <SectionTitle>Services</SectionTitle>
-          <Text style={styles.bodyText}>{VENUE.services}</Text>
+          <Text style={styles.bodyText}>{VENUE.servicesMobile}</Text>
         </View>
 
         {/* Map (the exported image has the address baked in at the bottom,
