@@ -44,6 +44,14 @@ const IMAGES = {
   venueA: require('./assets/Venue-A.png'),
   venueB: require('./assets/Venue-B.png'),
   map: require('./assets/map.png'),
+
+  // Desktop only ("There's more to explore" card). Export both from Figma at 2x,
+  // put them in ./assets, then swap each null for its require(...) line:
+  //   qr: require('./assets/qr.png'),
+  //   phone: require('./assets/phone.png'),
+  // While they are null, an icon stands in for the QR code and the phone is hidden.
+  qr: require('./assets/qr.png'),
+  phone: require('./assets/phone.png'),
 };
 
 // Screens at least this wide get the desktop layout (the web frame in Figma).
@@ -218,8 +226,6 @@ export default function VenueScreen() {
   const [liked, setLiked] = useState({}); // hearts on the venue cards, by id
   const [toast, setToast] = useState('');
 
-  const scrollRef = useRef(null);
-  const similarY = useRef(0);
   const toastTimer = useRef(null);
 
   // -- actions ---------------------------------------------------------------
@@ -285,8 +291,14 @@ export default function VenueScreen() {
     showToast("We'll email you when it's available");
   };
 
+  // The desktop design has no venue cards, so this opens a maps search for
+  // similar venues nearby. Swap it for your own "similar venues" page later.
   const findSimilar = () =>
-    scrollRef.current?.scrollTo({ y: Math.max(similarY.current - 24, 0), animated: true });
+    Linking.openURL(
+      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        `${VENUE.type} near ${VENUE.address}`
+      )}`
+    );
 
   const shared = {
     liked,
@@ -306,14 +318,12 @@ export default function VenueScreen() {
         <StatusBar hidden />
 
         <ScrollView
-          ref={scrollRef}
           showsVerticalScrollIndicator={isDesktop}
           contentContainerStyle={{ paddingBottom: 40 }}
         >
           {isDesktop ? (
             <DesktopLayout
               winWidth={winWidth}
-              onSimilarLayout={(y) => (similarY.current = y)}
               findSimilar={findSimilar}
               {...shared}
             />
@@ -485,10 +495,7 @@ function MobileLayout({
 // ---------------------------------------------------------------------------
 function DesktopLayout({
   winWidth,
-  onSimilarLayout,
   findSimilar,
-  liked,
-  toggleLike,
   saved,
   toggleSaved,
   shareVenue,
@@ -508,6 +515,15 @@ function DesktopLayout({
   const bandTop = 215; // source px where the band starts
   const mapH = mainW / 2.6;
   const mapImgH = mainW * (260 / 353);
+
+  // "There's more to explore" card. Sizes are fractions of the column width,
+  // measured from the Figma web frame, so it scales on smaller laptops.
+  const qrCardH = Math.max(mainW * 0.316, 150);
+  const qrSize = Math.max(Math.min(mainW * 0.19, 150), 84);
+  const phoneW = Math.max(mainW * 0.215, 90); // phone picture is 190 x 412 in Figma
+  const phoneH = phoneW * (412.39 / 190.22);
+  const phoneRight = mainW * 0.065;
+  const phoneTop = mainW * 0.025;
 
   return (
     <View style={{ width: '100%', alignItems: 'center' }}>
@@ -593,16 +609,62 @@ function DesktopLayout({
             </View>
 
             {/* Scan the QR code */}
-            <View style={[styles.dBlock, styles.dQrCard]}>
-              <View style={styles.dQrBox}>
-                <Ionicons name="qr-code-outline" size={84} color={theme.black} />
-              </View>
-              <View style={{ flex: 1 }}>
+            <View style={[styles.dBlock, styles.dQrCard, { height: qrCardH }]}>
+              {/* soft purple glow behind the phone */}
+              {IMAGES.phone && (
+                <View
+                  pointerEvents="none"
+                  style={[
+                    styles.dGlow,
+                    {
+                      right: phoneRight + phoneW * 0.1,
+                      top: qrCardH * 0.22,
+                      width: phoneW * 0.8,
+                      height: qrCardH * 0.5,
+                    },
+                  ]}
+                />
+              )}
+
+              {/* QR code: your exported picture, or an icon until you add it */}
+              {IMAGES.qr ? (
+                <Image
+                  source={IMAGES.qr}
+                  style={{ width: qrSize, height: qrSize, borderRadius: 12 }}
+                  resizeMode="contain"
+                />
+              ) : (
+                <View style={[styles.dQrBox, { width: qrSize, height: qrSize }]}>
+                  <Ionicons name="qr-code-outline" size={qrSize * 0.7} color={theme.black} />
+                </View>
+              )}
+
+              <View
+                style={{
+                  flex: 1,
+                  paddingRight: IMAGES.phone ? phoneW + phoneRight + 16 : 0,
+                }}
+              >
                 <Text style={styles.dQrTitle}>There's more to explore</Text>
                 <Text style={styles.dQrText}>
                   Scan the QR code to discover countless more venues like this one with our app
                 </Text>
               </View>
+
+              {/* phone picture on the right; the card cuts off its bottom */}
+              {IMAGES.phone && (
+                <Image
+                  source={IMAGES.phone}
+                  style={{
+                    position: 'absolute',
+                    right: phoneRight,
+                    top: phoneTop,
+                    width: phoneW,
+                    height: phoneH,
+                  }}
+                  resizeMode="contain"
+                />
+              )}
             </View>
 
             {/* Services */}
@@ -679,18 +741,6 @@ function DesktopLayout({
               </Text>
             </View>
           </View>
-        </View>
-
-        {/* Similar venues + nearby, full width underneath */}
-        <View
-          style={{ marginTop: 56 }}
-          onLayout={(e) => onSimilarLayout(e.nativeEvent.layout.y)}
-        >
-          <SectionTitle style={{ fontSize: 22 }}>Similar venues you may like</SectionTitle>
-          <VenueList data={SIMILAR} liked={liked} onToggleLike={toggleLike} bleed={0} />
-
-          <SectionTitle style={{ fontSize: 22, marginTop: 40 }}>Venues nearby</SectionTitle>
-          <VenueList data={NEARBY} liked={liked} onToggleLike={toggleLike} bleed={0} />
         </View>
       </View>
     </View>
@@ -891,10 +941,17 @@ const styles = StyleSheet.create({
   dQrCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 28,
-    backgroundColor: '#F7F6FF',
+    gap: 24,
+    backgroundColor: theme.surface,
     borderRadius: 20,
-    padding: 28,
+    paddingHorizontal: 24,
+    overflow: 'hidden', // cuts off the bottom of the phone picture
+  },
+  dGlow: {
+    position: 'absolute',
+    borderRadius: 999,
+    backgroundColor: 'rgba(91,69,245,0.25)',
+    boxShadow: '0 0 60px 40px rgba(91,69,245,0.25)',
   },
   dQrBox: {
     width: 120,
