@@ -612,7 +612,15 @@ function DesktopLayout({
             </View>
 
             {/* Scan the QR code */}
-            <View style={[styles.dBlock, styles.dQrCard, { height: qrCardH }]}>
+            <View
+              style={[
+                styles.dBlock,
+                styles.dQrCard,
+                // minHeight (not a fixed height) so the text is never cut off on
+                // narrower laptops; the card grows when the text needs more room
+                { minHeight: qrCardH, paddingVertical: 20 },
+              ]}
+            >
               {/* soft purple glow behind the phone */}
               {IMAGES.phone && (
                 <View
