@@ -119,6 +119,57 @@ function SectionTitle({ children, style }) {
 
 // Round icon button. `outlined` is the white-with-border style used on desktop,
 // the default is the frosted style that sits on top of the hero photo.
+// The pin is drawn in code (not part of the map picture). PIN_X / PIN_Y are where the
+// pin's tip sits on the 353 x 260 map picture, as a fraction. Change them to move it.
+const PIN_X = 0.5;
+const PIN_Y = 0.4;
+
+function MapPin({ mapWidth, onPress }) {
+  const k = Math.min(mapWidth / 353, 1.2); // scales with the map, but never gets huge on desktop
+  const bubbleW = 54 * k;
+  const bubbleH = 26 * k;
+  const tail = 7 * k;
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityLabel="Open directions"
+      style={{
+        position: 'absolute',
+        left: PIN_X * mapWidth - bubbleW / 2,
+        top: PIN_Y * mapWidth * (260 / 353) - bubbleH - tail,
+        width: bubbleW,
+        alignItems: 'center',
+      }}
+    >
+      <View
+        style={{
+          width: bubbleW,
+          height: bubbleH,
+          borderRadius: bubbleH / 2,
+          backgroundColor: theme.black,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Ionicons name="storefront-outline" size={Math.max(14, 16 * k)} color={theme.white} />
+      </View>
+      <View
+        style={{
+          width: 0,
+          height: 0,
+          borderLeftWidth: tail,
+          borderRightWidth: tail,
+          borderTopWidth: tail,
+          borderLeftColor: 'transparent',
+          borderRightColor: 'transparent',
+          borderTopColor: theme.black,
+          marginTop: -1,
+        }}
+      />
+    </Pressable>
+  );
+}
+
 function RoundButton({ icon, label, onPress, active, outlined }) {
   return (
     <Pressable
@@ -470,6 +521,7 @@ function MobileLayout({
               style={{ width: mapW, height: mapH }}
               resizeMode="cover"
             />
+            <MapPin mapWidth={mapW} onPress={getDirections} />
           </View>
           <Text style={styles.address}>{VENUE.address}</Text>
           <Pressable onPress={getDirections}>
@@ -700,6 +752,7 @@ function DesktopLayout({
                   style={{ width: mainW, height: mapImgH }}
                   resizeMode="cover"
                 />
+                <MapPin mapWidth={mainW} onPress={getDirections} />
               </View>
               <View style={[styles.dSubRow, { marginTop: 12 }]}>
                 <Text style={styles.dSub}>{VENUE.address}</Text>
@@ -812,8 +865,8 @@ const styles = StyleSheet.create({
   locationText: { fontSize: 14, fontWeight: '500', color: theme.black },
   locationDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: theme.black },
   notice: {
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 23,
     fontWeight: '500',
     color: theme.black,
     marginTop: 28,
@@ -848,8 +901,8 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   bodyText: {
-    fontSize: 14,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 21,
     fontWeight: '500',
     color: theme.black,
   },
@@ -977,7 +1030,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dQrTitle: { fontSize: 20, fontWeight: '700', color: theme.black },
-  dQrText: { fontSize: 15, lineHeight: 23, fontWeight: '500', color: theme.black, marginTop: 8 },
+  dQrText: { fontSize: 18, lineHeight: 25, fontWeight: '500', color: theme.black, marginTop: 8 },
 
   dInfoRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 4 },
 
@@ -991,6 +1044,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.white,
   },
   dCardTitle: { fontSize: 18, fontWeight: '700', color: theme.black },
-  dCardText: { fontSize: 14, lineHeight: 22, fontWeight: '500', color: theme.black, marginTop: 12 },
+  dCardText: { fontSize: 16, lineHeight: 22, fontWeight: '500', color: theme.black, marginTop: 12 },
   dCardSmall: { fontSize: 13, color: theme.muted, marginTop: 20 },
 });
