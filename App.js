@@ -533,8 +533,11 @@ function DesktopLayout({
           <Text style={styles.dLogo}>self vibe</Text>
           <View style={styles.dHeaderRight}>
             <Text style={styles.dHeaderLink}>List your business</Text>
-            <View style={styles.dAvatar}>
-              <Ionicons name="person-outline" size={16} color={theme.black} />
+            <View style={styles.dAvatarRow}>
+              <View style={styles.dAvatar}>
+                <Text style={styles.dAvatarText}>A</Text>
+              </View>
+              <Ionicons name="chevron-down" size={14} color={theme.black} />
             </View>
           </View>
         </View>
@@ -900,15 +903,17 @@ const styles = StyleSheet.create({
   dLogo: { fontSize: 30, fontWeight: '700', letterSpacing: -1, color: theme.black },
   dHeaderRight: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   dHeaderLink: { fontSize: 14, fontWeight: '500', color: theme.black },
+  dAvatarRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  // Round purple "A" like the profile picture in the Figma header
   dAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: theme.border,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#EEEBFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  dAvatarText: { color: theme.purple, fontSize: 14, fontWeight: '700' },
   dCrumbs: { fontSize: 13, color: theme.muted, marginTop: 24 },
   dTitleRow: {
     flexDirection: 'row',
