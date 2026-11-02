@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import {
   View,
-  Text,
+  Text as RNText,
   ScrollView,
   FlatList,
   Image,
@@ -14,6 +14,26 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
+// Figma uses Montserrat for body text and Livvic for headings. On web we load them
+// from Google Fonts; on a phone build they fall back to the system font.
+const BODY_FONT = 'Montserrat, system-ui, sans-serif';
+const HEAD_FONT = 'Livvic, Montserrat, system-ui, sans-serif';
+if (Platform.OS === 'web' && typeof document !== 'undefined') {
+  const id = 'sv-fonts';
+  if (!document.getElementById(id)) {
+    const link = document.createElement('link');
+    link.id = id;
+    link.rel = 'stylesheet';
+    link.href =
+      'https://fonts.googleapis.com/css2?family=Livvic:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap';
+    document.head.appendChild(link);
+  }
+}
+// Every <Text> gets Montserrat unless its style sets another font.
+function Text({ style, ...rest }) {
+  return <RNText {...rest} style={[{ fontFamily: BODY_FONT }, style]} />;
+}
 
 // ---------------------------------------------------------------------------
 // Design tokens. Guessed from the Figma screenshots, so confirm them in
@@ -845,7 +865,7 @@ const styles = StyleSheet.create({
 
   body: { paddingHorizontal: 20, paddingTop: 28 },
 
-  title: { fontSize: 26, lineHeight: 32, fontWeight: '700', color: theme.black },
+  title: { fontFamily: HEAD_FONT, fontSize: 28, lineHeight: 34, fontWeight: '600', color: theme.black },
   category: { fontSize: 14, color: theme.muted, marginTop: 6 },
   locationPill: {
     flexDirection: 'row',
@@ -862,7 +882,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     gap: 8,
   },
-  locationText: { fontSize: 14, fontWeight: '500', color: theme.black },
+  locationText: { fontSize: 16, fontWeight: '500', color: theme.black },
   locationDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: theme.black },
   notice: {
     fontSize: 16,
@@ -895,8 +915,9 @@ const styles = StyleSheet.create({
 
   section: { marginTop: 42 },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontFamily: HEAD_FONT,
+    fontSize: 20,
+    fontWeight: '600',
     color: theme.black,
     marginBottom: 14,
   },
@@ -961,7 +982,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  dLogo: { fontSize: 30, fontWeight: '700', letterSpacing: -1, color: theme.black },
+  dLogo: { fontFamily: HEAD_FONT, fontSize: 30, fontWeight: '600', letterSpacing: -1, color: theme.black },
   dHeaderRight: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   dHeaderLink: { fontSize: 14, fontWeight: '500', color: theme.black },
   dAvatarRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
@@ -983,7 +1004,7 @@ const styles = StyleSheet.create({
     marginTop: 14,
     marginBottom: 24,
   },
-  dTitle: { fontSize: 44, lineHeight: 52, fontWeight: '700', color: theme.black },
+  dTitle: { fontFamily: HEAD_FONT, fontSize: 44, lineHeight: 52, fontWeight: '600', color: theme.black },
   dSubRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 6, flexWrap: 'wrap' },
   dSub: { fontSize: 15, fontWeight: '500', color: theme.black },
   dDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: theme.black },
@@ -992,7 +1013,7 @@ const styles = StyleSheet.create({
   dColumns: { flexDirection: 'row', alignItems: 'flex-start', gap: 32 },
   dBlock: { marginTop: 40 },
   dAboutRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
-  dH2: { fontSize: 24, lineHeight: 30, fontWeight: '700', color: theme.black },
+  dH2: { fontFamily: HEAD_FONT, fontSize: 24, lineHeight: 30, fontWeight: '600', color: theme.black },
   dBody: { fontSize: 15, lineHeight: 24, fontWeight: '500', color: theme.black, marginTop: 8 },
   dClaim: {
     height: 36,
@@ -1029,7 +1050,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dQrTitle: { fontSize: 20, fontWeight: '700', color: theme.black },
+  dQrTitle: { fontSize: 22, lineHeight: 30, fontWeight: '700', color: theme.black },
   dQrText: { fontSize: 18, lineHeight: 25, fontWeight: '500', color: theme.black, marginTop: 8 },
 
   dInfoRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 4 },
@@ -1043,7 +1064,7 @@ const styles = StyleSheet.create({
     padding: 24,
     backgroundColor: theme.white,
   },
-  dCardTitle: { fontSize: 18, fontWeight: '700', color: theme.black },
+  dCardTitle: { fontFamily: HEAD_FONT, fontSize: 24, lineHeight: 30, fontWeight: '600', color: theme.black },
   dCardText: { fontSize: 16, lineHeight: 22, fontWeight: '500', color: theme.black, marginTop: 12 },
   dCardSmall: { fontSize: 13, color: theme.muted, marginTop: 20 },
 });
